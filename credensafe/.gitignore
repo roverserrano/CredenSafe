@@ -46,5 +46,5 @@ app.*.map.json
 
 #credential files
 .env
-.env_credentials
+.env_example
 .codex
