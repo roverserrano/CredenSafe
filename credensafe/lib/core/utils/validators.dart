@@ -26,6 +26,32 @@ class Validators {
     if (value.length < minLength) {
       return 'Debe tener al menos $minLength caracteres';
     }
+    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+      return 'Debe incluir al menos una letra mayúscula';
+    }
+    if (!RegExp(r'[a-z]').hasMatch(value)) {
+      return 'Debe incluir al menos una letra minúscula';
+    }
+    if (!RegExp(r'\d').hasMatch(value)) {
+      return 'Debe incluir al menos un número';
+    }
+    return null;
+  }
+
+  static String? requiredPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'La contraseña es obligatoria';
+    }
+    return null;
+  }
+
+  static String? confirmPassword(String? value, String password) {
+    if (value == null || value.isEmpty) {
+      return 'Debes confirmar la contraseña';
+    }
+    if (value != password) {
+      return 'Las contraseñas no coinciden';
+    }
     return null;
   }
 

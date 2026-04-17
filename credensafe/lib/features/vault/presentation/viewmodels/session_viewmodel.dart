@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../auth/domain/models/app_user.dart';
+import '../../../auth/domain/models/auth_session_state.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../../credentials/domain/repositories/audit_repository.dart';
 import '../../domain/models/vault.dart';
@@ -27,12 +28,13 @@ class SessionViewModel extends ChangeNotifier {
   final AuditRepository _auditRepository;
   final SupabaseClient _client;
 
-  StreamSubscription<AppUser?>? _authSubscription;
+  StreamSubscription<AuthSessionState>? _authSubscription;
 
   bool isInitializing = true;
   AppUser? currentUser;
   Vault? currentVault;
   VaultUnlockContext? unlockedContext;
+  bool passwordRecoveryPending = false;
 
   bool get isAuthenticated => currentUser != null;
   bool get hasVault => currentVault != null;
@@ -43,9 +45,13 @@ class SessionViewModel extends ChangeNotifier {
     currentUser = _authRepository.currentUser();
     await _bootstrap();
     _authSubscription?.cancel();
-    _authSubscription = _authRepository.authStateChanges().listen((user) async {
-      currentUser = user;
+    _authSubscription =
+        _authRepository.sessionStateChanges().listen((state) async {
+      currentUser = state.user;
       unlockedContext = null;
+      if (state.event == AuthSessionEvent.passwordRecovery) {
+        passwordRecoveryPending = true;
+      }
       await _bootstrap();
     });
   }
@@ -127,8 +133,14 @@ class SessionViewModel extends ChangeNotifier {
 
   Future<void> signOut() async {
     lockVault();
+    passwordRecoveryPending = false;
     await _vaultRepository.clearCachedVaultKey();
     await _authRepository.signOut();
+  }
+
+  void completePasswordRecovery() {
+    passwordRecoveryPending = false;
+    notifyListeners();
   }
 
   void lockVault() {

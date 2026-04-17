@@ -9,9 +9,7 @@ class SecureStorageKeys {
 class SecureStorageService {
   const SecureStorageService();
 
-  static const FlutterSecureStorage _storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
+  static const FlutterSecureStorage _storage = FlutterSecureStorage();
 
   Future<void> write(String key, String value) =>
       _storage.write(key: key, value: value);

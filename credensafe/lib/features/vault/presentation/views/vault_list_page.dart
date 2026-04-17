@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/utils/validators.dart';
-import '../viewmodels/vault_setup_viewmodel.dart';
+import '../viewmodels/vault_list_viewmodel.dart';
 
 class VaultSetupPage extends StatefulWidget {
   const VaultSetupPage({super.key});

@@ -7,10 +7,9 @@ import 'session_viewmodel.dart';
 class UnlockVaultViewModel extends ChangeNotifier {
   UnlockVaultViewModel({
     required VaultRepository vaultRepository,
-    required SessionViewModel sessionViewModel,
+    required this.sessionViewModel,
     required AuditRepository auditRepository,
   })  : _vaultRepository = vaultRepository,
-        sessionViewModel = sessionViewModel,
         _auditRepository = auditRepository;
 
   final VaultRepository _vaultRepository;

@@ -11,11 +11,10 @@ class CredentialFormViewModel extends ChangeNotifier {
     required CredentialRepository credentialRepository,
     required AuditRepository auditRepository,
     required PasswordGeneratorService generatorService,
-    required SessionViewModel sessionViewModel,
+    required this.sessionViewModel,
   })  : _credentialRepository = credentialRepository,
         _auditRepository = auditRepository,
-        _generatorService = generatorService,
-        sessionViewModel = sessionViewModel;
+        _generatorService = generatorService;
 
   final CredentialRepository _credentialRepository;
   final AuditRepository _auditRepository;

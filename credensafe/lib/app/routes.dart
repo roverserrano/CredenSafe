@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'di.dart';
+import '../features/vault/presentation/viewmodels/session_viewmodel.dart';
 
 class LifecycleLockWrapper extends StatefulWidget {
   const LifecycleLockWrapper({super.key, required this.child});

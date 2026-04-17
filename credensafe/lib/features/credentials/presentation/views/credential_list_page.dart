@@ -96,7 +96,7 @@ class _CredentialListPageState extends State<CredentialListPage> {
                         ),
                       );
                     },
-                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    separatorBuilder: (_, _) => const SizedBox(height: 8),
                     itemCount: vm.credentials.length,
                   ),
       ),

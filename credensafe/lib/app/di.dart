@@ -6,12 +6,14 @@ import '../core/crypto/biometric_gate_service.dart';
 import '../core/crypto/encryption_service.dart';
 import '../core/crypto/key_derivation_service.dart';
 import '../core/crypto/password_generator_service.dart';
-import '../core/crypto/secure_storage_service.dart';
+import '../core/crypto/secure_key_store_service.dart';
 import '../features/auth/data/repositories/auth_repository_impl.dart';
 import '../features/auth/data/services/auth_remote_service.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
+import '../features/auth/presentation/viewmodels/forgot_password_viewmodel.dart';
 import '../features/auth/presentation/viewmodels/login_viewmodel.dart';
 import '../features/auth/presentation/viewmodels/register_viewmodel.dart';
+import '../features/auth/presentation/viewmodels/update_password_viewmodel.dart';
 import '../features/credentials/data/repositories/audit_repository_impl.dart';
 import '../features/credentials/data/repositories/credential_repository_impl.dart';
 import '../features/credentials/data/services/audit_remote_service.dart';
@@ -22,13 +24,13 @@ import '../features/credentials/presentation/viewmodels/credential_detail_viewmo
 import '../features/credentials/presentation/viewmodels/credential_form_viewmodel.dart';
 import '../features/credentials/presentation/viewmodels/credential_list_viewmodel.dart';
 import '../features/credentials/presentation/viewmodels/security_activity_viewmodel.dart';
-import '../features/settings/presentation/viewmodels/settings_viewmodel.dart';
+import '../features/setting/presentation/viewmodels/settings_viewmodel.dart';
 import '../features/vault/data/repositories/vault_repository_impl.dart';
 import '../features/vault/data/services/vault_remote_service.dart';
 import '../features/vault/domain/repositories/vault_repository.dart';
 import '../features/vault/presentation/viewmodels/session_viewmodel.dart';
 import '../features/vault/presentation/viewmodels/unlock_vault_viewmodel.dart';
-import '../features/vault/presentation/viewmodels/vault_setup_viewmodel.dart';
+import '../features/vault/presentation/viewmodels/vault_list_viewmodel.dart';
 
 class AppProviders extends StatelessWidget {
   const AppProviders({super.key, required this.child});
@@ -101,6 +103,16 @@ class AppProviders extends StatelessWidget {
             context.read<AuthRepository>(),
           ),
         ),
+        ChangeNotifierProvider(
+          create: (context) => ForgotPasswordViewModel(
+            context.read<AuthRepository>(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => UpdatePasswordViewModel(
+            context.read<AuthRepository>(),
+          ),
+        ),
         ChangeNotifierProxyProvider<SessionViewModel, VaultSetupViewModel>(
           create: (context) => VaultSetupViewModel(
             vaultRepository: context.read<VaultRepository>(),
@@ -150,6 +162,7 @@ class AppProviders extends StatelessWidget {
           create: (context) => SettingsViewModel(
             sessionViewModel: context.read<SessionViewModel>(),
             auditRepository: context.read<AuditRepository>(),
+            authRepository: context.read<AuthRepository>(),
           ),
           update: (_, sessionVm, current) =>
               current!..sessionViewModel = sessionVm,
@@ -165,5 +178,3 @@ class AppProviders extends StatelessWidget {
     );
   }
 }
-
-export '../features/vault/presentation/viewmodels/session_viewmodel.dart';

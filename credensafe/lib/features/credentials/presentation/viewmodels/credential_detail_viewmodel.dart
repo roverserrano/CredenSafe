@@ -10,10 +10,9 @@ class CredentialDetailViewModel extends ChangeNotifier {
   CredentialDetailViewModel({
     required CredentialRepository credentialRepository,
     required AuditRepository auditRepository,
-    required SessionViewModel sessionViewModel,
+    required this.sessionViewModel,
   })  : _credentialRepository = credentialRepository,
-        _auditRepository = auditRepository,
-        sessionViewModel = sessionViewModel;
+        _auditRepository = auditRepository;
 
   final CredentialRepository _credentialRepository;
   final AuditRepository _auditRepository;

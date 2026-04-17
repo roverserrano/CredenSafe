@@ -3,7 +3,7 @@ import 'dart:convert';
 import '../../../../core/crypto/biometric_gate_service.dart';
 import '../../../../core/crypto/encryption_service.dart';
 import '../../../../core/crypto/key_derivation_service.dart';
-import '../../../../core/crypto/secure_storage_service.dart';
+import '../../../../core/crypto/secure_key_store_service.dart';
 import '../../domain/models/vault.dart';
 import '../../domain/models/vault_unlock_context.dart';
 import '../../domain/repositories/vault_repository.dart';

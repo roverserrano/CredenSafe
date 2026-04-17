@@ -1,4 +1,4 @@
-import '../../vault/domain/models/vault_unlock_context.dart';
+import '../../../vault/domain/models/vault_unlock_context.dart';
 import '../models/credential_metadata.dart';
 import '../models/decrypted_credential.dart';
 

@@ -7,9 +7,8 @@ import '../../../vault/presentation/viewmodels/session_viewmodel.dart';
 class CredentialListViewModel extends ChangeNotifier {
   CredentialListViewModel({
     required CredentialRepository credentialRepository,
-    required SessionViewModel sessionViewModel,
-  })  : _credentialRepository = credentialRepository,
-        sessionViewModel = sessionViewModel;
+    required this.sessionViewModel,
+  }) : _credentialRepository = credentialRepository;
 
   final CredentialRepository _credentialRepository;
   SessionViewModel sessionViewModel;

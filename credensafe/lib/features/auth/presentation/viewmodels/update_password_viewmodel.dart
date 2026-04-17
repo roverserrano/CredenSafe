@@ -4,37 +4,34 @@ import '../../../../core/errors/app_exceptions.dart';
 import '../../domain/repositories/auth_repository.dart';
 import 'auth_form_status.dart';
 
-class LoginViewModel extends ChangeNotifier {
-  LoginViewModel(this._authRepository);
+class UpdatePasswordViewModel extends ChangeNotifier {
+  UpdatePasswordViewModel(this._authRepository);
 
   final AuthRepository _authRepository;
 
-  LoginStatus status = LoginStatus.unauthenticated;
+  PasswordChangeStatus status = PasswordChangeStatus.initial;
   String? message;
 
-  bool get isLoading => status == LoginStatus.loading;
-  String? get errorMessage =>
-      status == LoginStatus.error ? message : null;
+  bool get isLoading => status == PasswordChangeStatus.loading;
 
-  Future<bool> signIn({required String email, required String password}) async {
-    status = LoginStatus.loading;
+  Future<bool> updatePassword({required String newPassword}) async {
+    status = PasswordChangeStatus.loading;
     message = null;
     notifyListeners();
 
     try {
-      final result = await _authRepository.signIn(
-        email: email.trim(),
-        password: password,
+      final result = await _authRepository.updatePassword(
+        newPassword: newPassword,
       );
-      status = LoginStatus.authenticated;
+      status = PasswordChangeStatus.success;
       message = result.message;
       return true;
     } on AppException catch (error) {
-      status = LoginStatus.error;
+      status = PasswordChangeStatus.error;
       message = error.message;
       return false;
     } catch (_) {
-      status = LoginStatus.error;
+      status = PasswordChangeStatus.error;
       message = 'Ocurrió un error inesperado. Intenta nuevamente.';
       return false;
     } finally {
@@ -43,7 +40,7 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   void markValidating() {
-    status = LoginStatus.validating;
+    status = PasswordChangeStatus.validating;
     message = null;
     notifyListeners();
   }

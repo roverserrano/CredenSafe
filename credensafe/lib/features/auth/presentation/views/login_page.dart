@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
                               : Icons.visibility_off),
                         ),
                       ),
-                      validator: Validators.password,
+                      validator: Validators.requiredPassword,
                     ),
                     if (vm.errorMessage != null) ...[
                       const SizedBox(height: 12),
@@ -90,6 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: vm.isLoading
                           ? null
                           : () async {
+                              vm.markValidating();
                               if (!_formKey.currentState!.validate()) return;
                               await vm.signIn(
                                 email: _emailController.text,
@@ -108,6 +109,13 @@ class _LoginPageState extends State<LoginPage> {
                     OutlinedButton(
                       onPressed: () => AppNavigator.toRegister(context),
                       child: const Text('Crear cuenta'),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton(
+                      onPressed: vm.isLoading
+                          ? null
+                          : () => AppNavigator.toForgotPassword(context),
+                      child: const Text('¿Olvidaste tu contraseña?'),
                     ),
                   ],
                 ),

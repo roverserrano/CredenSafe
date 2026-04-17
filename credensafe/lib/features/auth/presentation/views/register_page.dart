@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/utils/validators.dart';
+import '../viewmodels/auth_form_status.dart';
 import '../viewmodels/register_viewmodel.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -62,10 +63,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         labelText: 'Confirmar contraseña',
                       ),
                       validator: (value) {
-                        if (value != _passwordController.text) {
-                          return 'Las contraseñas no coinciden';
-                        }
-                        return null;
+                        return Validators.confirmPassword(
+                          value,
+                          _passwordController.text,
+                        );
                       },
                     ),
                     if (vm.errorMessage != null) ...[
@@ -84,12 +85,15 @@ class _RegisterPageState extends State<RegisterPage> {
                       onPressed: vm.isLoading
                           ? null
                           : () async {
+                              vm.markValidating();
                               if (!_formKey.currentState!.validate()) return;
                               final ok = await vm.signUp(
                                 email: _emailController.text,
                                 password: _passwordController.text,
                               );
-                              if (ok && context.mounted) {
+                              if (ok &&
+                                  vm.status == RegisterStatus.success &&
+                                  context.mounted) {
                                 Navigator.of(context).pop();
                               }
                             },

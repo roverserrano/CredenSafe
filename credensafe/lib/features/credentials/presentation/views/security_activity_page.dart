@@ -43,7 +43,7 @@ class _SecurityActivityPageState extends State<SecurityActivityPage> {
                   ),
                 );
               },
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemCount: vm.events.length,
             ),
     );
