@@ -75,6 +75,10 @@ class CredenSafeRoot extends StatelessWidget {
       return const SplashPage();
     }
 
+    if (session.sessionErrorMessage != null) {
+      return const SessionErrorPage();
+    }
+
     if (!session.isAuthenticated) {
       return const LoginPage();
     }
@@ -111,6 +115,62 @@ class SplashPage extends StatelessWidget {
             SizedBox(height: 24),
             CircularProgressIndicator(),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class SessionErrorPage extends StatelessWidget {
+  const SessionErrorPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final session = context.watch<SessionViewModel>();
+
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Icon(Icons.wifi_off_rounded, size: 64),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No pudimos cargar tu sesión',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    session.sessionErrorMessage ??
+                        'Revisa tu conexión e intenta nuevamente.',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: () {
+                      session.retryInitialization();
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Reintentar'),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () {
+                      session.signOut();
+                    },
+                    child: const Text('Cerrar sesión'),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -168,21 +228,21 @@ class AppNavigator {
   const AppNavigator._();
 
   static Future<void> toRegister(BuildContext context) {
-    return Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const RegisterPage()),
-    );
+    return Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const RegisterPage()));
   }
 
   static Future<void> toForgotPassword(BuildContext context) {
-    return Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ForgotPasswordPage()),
-    );
+    return Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const ForgotPasswordPage()));
   }
 
   static Future<void> toUpdatePassword(BuildContext context) {
-    return Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const UpdatePasswordPage()),
-    );
+    return Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const UpdatePasswordPage()));
   }
 
   static Future<void> toCredentialForm(
@@ -197,14 +257,14 @@ class AppNavigator {
   }
 
   static Future<void> toSecurityActivity(BuildContext context) {
-    return Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const SecurityActivityPage()),
-    );
+    return Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const SecurityActivityPage()));
   }
 
   static Future<void> toSettings(BuildContext context) {
-    return Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const SettingsPage()),
-    );
+    return Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const SettingsPage()));
   }
 }
