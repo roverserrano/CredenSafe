@@ -69,9 +69,11 @@ class DecryptedCredential {
       notes: sensitive['notes'] as String?,
       customFields: (sensitive['customFields'] as List<dynamic>? ?? const [])
           .whereType<Map<String, dynamic>>()
-          .map((item) => item.map(
-                (key, value) => MapEntry(key.toString(), value.toString()),
-              ))
+          .map(
+            (item) => item.map(
+              (key, value) => MapEntry(key.toString(), value.toString()),
+            ),
+          )
           .toList(),
     );
   }

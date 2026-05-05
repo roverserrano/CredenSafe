@@ -62,8 +62,9 @@ class CredentialRemoteService {
   }
 
   Future<void> softDeleteCredential(String credentialId) async {
-    await _client.from('credentials').update({
-      'deleted_at': DateTime.now().toIso8601String(),
-    }).eq('id', credentialId);
+    await _client
+        .from('credentials')
+        .update({'deleted_at': DateTime.now().toIso8601String()})
+        .eq('id', credentialId);
   }
 }

@@ -8,8 +8,8 @@ class SecurityActivityViewModel extends ChangeNotifier {
   SecurityActivityViewModel({
     required AuditRepository auditRepository,
     required SessionViewModel sessionViewModel,
-  })  : _auditRepository = auditRepository,
-        _sessionViewModel = sessionViewModel;
+  }) : _auditRepository = auditRepository,
+       _sessionViewModel = sessionViewModel;
 
   final AuditRepository _auditRepository;
   final SessionViewModel _sessionViewModel;

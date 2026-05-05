@@ -85,7 +85,11 @@ class _CredentialFormPageState extends State<CredentialFormPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.credentialId == null ? 'Nueva credencial' : 'Editar credencial'),
+        title: Text(
+          widget.credentialId == null
+              ? 'Nueva credencial'
+              : 'Editar credencial',
+        ),
         actions: [
           IconButton(
             onPressed: () {
@@ -111,7 +115,9 @@ class _CredentialFormPageState extends State<CredentialFormPage> {
                         children: [
                           TextFormField(
                             controller: _appNameController,
-                            decoration: const InputDecoration(labelText: 'Aplicación / servicio'),
+                            decoration: const InputDecoration(
+                              labelText: 'Aplicación / servicio',
+                            ),
                             validator: (value) => Validators.requiredField(
                               value,
                               fieldName: 'Aplicación',
@@ -125,68 +131,91 @@ class _CredentialFormPageState extends State<CredentialFormPage> {
                           const SizedBox(height: 12),
                           TextFormField(
                             controller: _categoryController,
-                            decoration: const InputDecoration(labelText: 'Categoría'),
+                            decoration: const InputDecoration(
+                              labelText: 'Categoría',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             controller: _labelController,
-                            decoration: const InputDecoration(labelText: 'Nombre visible de la cuenta'),
+                            decoration: const InputDecoration(
+                              labelText: 'Nombre visible de la cuenta',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            decoration: const InputDecoration(labelText: 'Correo'),
+                            decoration: const InputDecoration(
+                              labelText: 'Correo',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             controller: _usernameController,
-                            decoration: const InputDecoration(labelText: 'Nombre de usuario'),
+                            decoration: const InputDecoration(
+                              labelText: 'Nombre de usuario',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             controller: _passwordController,
-                            decoration: const InputDecoration(labelText: 'Contraseña'),
+                            decoration: const InputDecoration(
+                              labelText: 'Contraseña',
+                            ),
                             validator: Validators.password,
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             controller: _phoneController,
-                            decoration: const InputDecoration(labelText: 'Número de teléfono'),
+                            decoration: const InputDecoration(
+                              labelText: 'Número de teléfono',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             controller: _securityCodeController,
-                            decoration: const InputDecoration(labelText: 'Código de seguridad'),
+                            decoration: const InputDecoration(
+                              labelText: 'Código de seguridad',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             controller: _recoveryEmailController,
-                            decoration: const InputDecoration(labelText: 'Correo de recuperación'),
+                            decoration: const InputDecoration(
+                              labelText: 'Correo de recuperación',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             controller: _recoveryPhoneController,
-                            decoration: const InputDecoration(labelText: 'Teléfono de recuperación'),
+                            decoration: const InputDecoration(
+                              labelText: 'Teléfono de recuperación',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             controller: _notesController,
                             maxLines: 4,
-                            decoration: const InputDecoration(labelText: 'Notas privadas'),
+                            decoration: const InputDecoration(
+                              labelText: 'Notas privadas',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           SwitchListTile.adaptive(
                             contentPadding: EdgeInsets.zero,
                             value: _favorite,
-                            onChanged: (value) => setState(() => _favorite = value),
+                            onChanged: (value) =>
+                                setState(() => _favorite = value),
                             title: const Text('Marcar como favorita'),
                           ),
                           if (vm.errorMessage != null) ...[
                             const SizedBox(height: 12),
                             Text(
                               vm.errorMessage!,
-                              style: TextStyle(color: Theme.of(context).colorScheme.error),
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.error,
+                              ),
                             ),
                           ],
                           const SizedBox(height: 16),
@@ -194,40 +223,67 @@ class _CredentialFormPageState extends State<CredentialFormPage> {
                             onPressed: vm.isLoading
                                 ? null
                                 : () async {
-                                    if (!_formKey.currentState!.validate()) return;
+                                    if (!_formKey.currentState!.validate()) {
+                                      return;
+                                    }
                                     final ok = await vm.save(
                                       DecryptedCredential(
                                         id: widget.credentialId,
                                         appName: _appNameController.text.trim(),
-                                        appUrl: _appUrlController.text.trim().isEmpty
+                                        appUrl:
+                                            _appUrlController.text
+                                                .trim()
+                                                .isEmpty
                                             ? null
                                             : _appUrlController.text.trim(),
-                                        category: _categoryController.text.trim().isEmpty
+                                        category:
+                                            _categoryController.text
+                                                .trim()
+                                                .isEmpty
                                             ? null
                                             : _categoryController.text.trim(),
-                                        accountLabel: _labelController.text.trim().isEmpty
+                                        accountLabel:
+                                            _labelController.text.trim().isEmpty
                                             ? null
                                             : _labelController.text.trim(),
-                                        email: _emailController.text.trim().isEmpty
+                                        email:
+                                            _emailController.text.trim().isEmpty
                                             ? null
                                             : _emailController.text.trim(),
-                                        username: _usernameController.text.trim().isEmpty
+                                        username:
+                                            _usernameController.text
+                                                .trim()
+                                                .isEmpty
                                             ? null
                                             : _usernameController.text.trim(),
                                         password: _passwordController.text,
-                                        phoneNumber: _phoneController.text.trim().isEmpty
+                                        phoneNumber:
+                                            _phoneController.text.trim().isEmpty
                                             ? null
                                             : _phoneController.text.trim(),
-                                        securityCode: _securityCodeController.text.trim().isEmpty
+                                        securityCode:
+                                            _securityCodeController.text
+                                                .trim()
+                                                .isEmpty
                                             ? null
-                                            : _securityCodeController.text.trim(),
-                                        recoveryEmail: _recoveryEmailController.text.trim().isEmpty
+                                            : _securityCodeController.text
+                                                  .trim(),
+                                        recoveryEmail:
+                                            _recoveryEmailController.text
+                                                .trim()
+                                                .isEmpty
                                             ? null
-                                            : _recoveryEmailController.text.trim(),
-                                        recoveryPhone: _recoveryPhoneController.text.trim().isEmpty
+                                            : _recoveryEmailController.text
+                                                  .trim(),
+                                        recoveryPhone:
+                                            _recoveryPhoneController.text
+                                                .trim()
+                                                .isEmpty
                                             ? null
-                                            : _recoveryPhoneController.text.trim(),
-                                        notes: _notesController.text.trim().isEmpty
+                                            : _recoveryPhoneController.text
+                                                  .trim(),
+                                        notes:
+                                            _notesController.text.trim().isEmpty
                                             ? null
                                             : _notesController.text.trim(),
                                         isFavorite: _favorite,
@@ -241,7 +297,9 @@ class _CredentialFormPageState extends State<CredentialFormPage> {
                                 ? const SizedBox(
                                     height: 20,
                                     width: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : const Text('Guardar'),
                           ),

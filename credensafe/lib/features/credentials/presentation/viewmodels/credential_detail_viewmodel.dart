@@ -1,20 +1,24 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/utils/clipboard_utils.dart';
+import '../../application/usecases/delete_credential_use_case.dart';
+import '../../application/usecases/read_credential_use_case.dart';
 import '../../domain/models/decrypted_credential.dart';
 import '../../domain/repositories/audit_repository.dart';
-import '../../domain/repositories/credential_repository.dart';
 import '../../../vault/presentation/viewmodels/session_viewmodel.dart';
 
 class CredentialDetailViewModel extends ChangeNotifier {
   CredentialDetailViewModel({
-    required CredentialRepository credentialRepository,
+    required ReadCredentialUseCase readCredentialUseCase,
+    required DeleteCredentialUseCase deleteCredentialUseCase,
     required AuditRepository auditRepository,
     required this.sessionViewModel,
-  })  : _credentialRepository = credentialRepository,
-        _auditRepository = auditRepository;
+  }) : _readCredentialUseCase = readCredentialUseCase,
+       _deleteCredentialUseCase = deleteCredentialUseCase,
+       _auditRepository = auditRepository;
 
-  final CredentialRepository _credentialRepository;
+  final ReadCredentialUseCase _readCredentialUseCase;
+  final DeleteCredentialUseCase _deleteCredentialUseCase;
   final AuditRepository _auditRepository;
   SessionViewModel sessionViewModel;
 
@@ -31,7 +35,7 @@ class CredentialDetailViewModel extends ChangeNotifier {
       isLoading = true;
       errorMessage = null;
       notifyListeners();
-      credential = await _credentialRepository.readCredential(
+      credential = await _readCredentialUseCase(
         unlockContext: context,
         credentialId: credentialId,
       );
@@ -54,7 +58,10 @@ class CredentialDetailViewModel extends ChangeNotifier {
     final context = sessionViewModel.unlockedContext;
     final credentialId = credential?.id;
     final password = credential?.password;
-    if (user == null || context == null || credentialId == null || password == null) {
+    if (user == null ||
+        context == null ||
+        credentialId == null ||
+        password == null) {
       return;
     }
     await ClipboardUtils.copyWithAutoClear(password);
@@ -72,7 +79,7 @@ class CredentialDetailViewModel extends ChangeNotifier {
     final credentialId = credential?.id;
     if (user == null || context == null || credentialId == null) return;
 
-    await _credentialRepository.softDeleteCredential(credentialId: credentialId);
+    await _deleteCredentialUseCase(credentialId: credentialId);
     await _auditRepository.insertEvent(
       userId: user.id,
       vaultId: context.vaultId,

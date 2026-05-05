@@ -19,7 +19,8 @@ class AuditEvent {
       eventType: map['event_type'] as String,
       eventStatus: map['event_status'] as String,
       createdAt: DateTime.parse(map['created_at'] as String),
-      metadata: (map['metadata'] as Map<String, dynamic>?) ??
+      metadata:
+          (map['metadata'] as Map<String, dynamic>?) ??
           const <String, dynamic>{},
     );
   }

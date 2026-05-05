@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../../../../core/crypto/encryption_service.dart';
+import '../../../../core/crypto/crypto_service.dart';
 import '../../../../core/utils/mask_utils.dart';
 import '../../../vault/domain/models/vault_unlock_context.dart';
 import '../../domain/models/credential_metadata.dart';
@@ -11,12 +11,12 @@ import '../services/credential_remote_service.dart';
 class CredentialRepositoryImpl implements CredentialRepository {
   CredentialRepositoryImpl({
     required CredentialRemoteService remoteService,
-    required EncryptionService encryptionService,
-  })  : _remoteService = remoteService,
-        _encryptionService = encryptionService;
+    required ICryptoService encryptionService,
+  }) : _remoteService = remoteService,
+       _encryptionService = encryptionService;
 
   final CredentialRemoteService _remoteService;
-  final EncryptionService _encryptionService;
+  final ICryptoService _encryptionService;
 
   @override
   Future<String> createCredential({
@@ -56,7 +56,9 @@ class CredentialRepositoryImpl implements CredentialRepository {
   }
 
   @override
-  Future<List<CredentialMetadata>> listCredentials({required String vaultId}) async {
+  Future<List<CredentialMetadata>> listCredentials({
+    required String vaultId,
+  }) async {
     final data = await _remoteService.listCredentials(vaultId);
     return data.map(CredentialMetadata.fromMap).toList();
   }
@@ -72,7 +74,8 @@ class CredentialRepositoryImpl implements CredentialRepository {
       payloadEncrypted: blob['payload_encrypted'] as String,
       nonceBase64: blob['payload_nonce'] as String,
       keyBytes: unlockContext.vaultKey,
-      aad: (blob['aad_json'] as Map<String, dynamic>?) ??
+      aad:
+          (blob['aad_json'] as Map<String, dynamic>?) ??
           {'credential_id': credentialId},
     );
     final sensitive = jsonDecode(decryptedJson) as Map<String, dynamic>;

@@ -53,55 +53,54 @@ class _CredentialDetailPageState extends State<CredentialDetailPage> {
       body: vm.isLoading
           ? const Center(child: CircularProgressIndicator())
           : credential == null
-              ? const Center(child: Text('No se pudo cargar la credencial'))
-              : ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _field('Aplicación', credential.appName),
-                    _field('URL', credential.appUrl),
-                    _field('Categoría', credential.category),
-                    _field('Cuenta', credential.accountLabel),
-                    _field('Correo', credential.email),
-                    _field('Usuario', credential.username),
-                    _secureField(
-                      label: 'Contraseña',
-                      value: credential.password,
-                      isVisible: _showPassword,
-                      onToggle: () => setState(() => _showPassword = !_showPassword),
-                      onCopy: vm.copyPassword,
-                    ),
-                    _field('Número de teléfono', credential.phoneNumber),
-                    _secureField(
-                      label: 'Código de seguridad',
-                      value: credential.securityCode,
-                      isVisible: _showSecurityCode,
-                      onToggle: () => setState(() => _showSecurityCode = !_showSecurityCode),
-                    ),
-                    _field('Correo de recuperación', credential.recoveryEmail),
-                    _field('Teléfono de recuperación', credential.recoveryPhone),
-                    _field('Notas privadas', credential.notes),
-                    const SizedBox(height: 24),
-                    FilledButton.tonal(
-                      onPressed: () async {
-                        await vm.deleteCurrent();
-                        if (context.mounted) {
-                          Navigator.of(context).pop();
-                        }
-                      },
-                      child: const Text('Eliminar credencial'),
-                    ),
-                  ],
+          ? const Center(child: Text('No se pudo cargar la credencial'))
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                _field('Aplicación', credential.appName),
+                _field('URL', credential.appUrl),
+                _field('Categoría', credential.category),
+                _field('Cuenta', credential.accountLabel),
+                _field('Correo', credential.email),
+                _field('Usuario', credential.username),
+                _secureField(
+                  label: 'Contraseña',
+                  value: credential.password,
+                  isVisible: _showPassword,
+                  onToggle: () =>
+                      setState(() => _showPassword = !_showPassword),
+                  onCopy: vm.copyPassword,
                 ),
+                _field('Número de teléfono', credential.phoneNumber),
+                _secureField(
+                  label: 'Código de seguridad',
+                  value: credential.securityCode,
+                  isVisible: _showSecurityCode,
+                  onToggle: () =>
+                      setState(() => _showSecurityCode = !_showSecurityCode),
+                ),
+                _field('Correo de recuperación', credential.recoveryEmail),
+                _field('Teléfono de recuperación', credential.recoveryPhone),
+                _field('Notas privadas', credential.notes),
+                const SizedBox(height: 24),
+                FilledButton.tonal(
+                  onPressed: () async {
+                    await vm.deleteCurrent();
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: const Text('Eliminar credencial'),
+                ),
+              ],
+            ),
     );
   }
 
   Widget _field(String label, String? value) {
     if (value == null || value.isEmpty) return const SizedBox.shrink();
     return Card(
-      child: ListTile(
-        title: Text(label),
-        subtitle: Text(value),
-      ),
+      child: ListTile(title: Text(label), subtitle: Text(value)),
     );
   }
 
@@ -121,10 +120,7 @@ class _CredentialDetailPageState extends State<CredentialDetailPage> {
           spacing: 8,
           children: [
             if (onCopy != null)
-              IconButton(
-                onPressed: onCopy,
-                icon: const Icon(Icons.copy),
-              ),
+              IconButton(onPressed: onCopy, icon: const Icon(Icons.copy)),
             IconButton(
               onPressed: onToggle,
               icon: Icon(isVisible ? Icons.visibility_off : Icons.visibility),

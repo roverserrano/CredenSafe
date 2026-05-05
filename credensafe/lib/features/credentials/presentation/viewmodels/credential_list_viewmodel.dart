@@ -1,16 +1,20 @@
 import 'package:flutter/foundation.dart';
 
+import '../../application/usecases/delete_credential_use_case.dart';
+import '../../application/usecases/list_credentials_use_case.dart';
 import '../../domain/models/credential_metadata.dart';
-import '../../domain/repositories/credential_repository.dart';
 import '../../../vault/presentation/viewmodels/session_viewmodel.dart';
 
 class CredentialListViewModel extends ChangeNotifier {
   CredentialListViewModel({
-    required CredentialRepository credentialRepository,
+    required ListCredentialsUseCase listCredentialsUseCase,
+    required DeleteCredentialUseCase deleteCredentialUseCase,
     required this.sessionViewModel,
-  }) : _credentialRepository = credentialRepository;
+  }) : _listCredentialsUseCase = listCredentialsUseCase,
+       _deleteCredentialUseCase = deleteCredentialUseCase;
 
-  final CredentialRepository _credentialRepository;
+  final ListCredentialsUseCase _listCredentialsUseCase;
+  final DeleteCredentialUseCase _deleteCredentialUseCase;
   SessionViewModel sessionViewModel;
 
   bool isLoading = false;
@@ -24,7 +28,7 @@ class CredentialListViewModel extends ChangeNotifier {
       isLoading = true;
       errorMessage = null;
       notifyListeners();
-      credentials = await _credentialRepository.listCredentials(vaultId: vaultId);
+      credentials = await _listCredentialsUseCase(vaultId: vaultId);
     } catch (_) {
       errorMessage = 'No se pudo cargar la lista de credenciales';
     } finally {
@@ -34,7 +38,7 @@ class CredentialListViewModel extends ChangeNotifier {
   }
 
   Future<void> delete(String credentialId) async {
-    await _credentialRepository.softDeleteCredential(credentialId: credentialId);
+    await _deleteCredentialUseCase(credentialId: credentialId);
     credentials.removeWhere((item) => item.id == credentialId);
     notifyListeners();
   }

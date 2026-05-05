@@ -47,58 +47,63 @@ class _CredentialListPageState extends State<CredentialListPage> {
         child: vm.isLoading
             ? const Center(child: CircularProgressIndicator())
             : vm.credentials.isEmpty
-                ? ListView(
-                    padding: const EdgeInsets.all(24),
-                    children: const [
-                      SizedBox(height: 120),
-                      Icon(Icons.lock_outline, size: 64),
-                      SizedBox(height: 12),
-                      Text(
-                        'Todavía no tienes credenciales guardadas',
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.all(16),
-                    itemBuilder: (context, index) {
-                      final item = vm.credentials[index];
-                      return Card(
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            child: Text(item.appName.characters.first.toUpperCase()),
-                          ),
-                          title: Text(item.appName),
-                          subtitle: Text(
-                            [item.accountLabel, item.emailHint, item.loginHint]
-                                .where((e) => e != null && e.isNotEmpty)
-                                .join(' • '),
-                          ),
-                          trailing: item.isFavorite
-                              ? const Icon(Icons.star)
-                              : const Icon(Icons.chevron_right),
-                          onTap: () async {
-                            final detailVm = context.read<CredentialDetailViewModel>();
-                            await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => ChangeNotifierProvider.value(
-                                  value: detailVm,
-                                  child: CredentialDetailPage(
-                                    credentialId: item.id,
-                                  ),
-                                ),
-                              ),
-                            );
-                            if (context.mounted) {
-                              await vm.load();
-                            }
-                          },
-                        ),
-                      );
-                    },
-                    separatorBuilder: (_, _) => const SizedBox(height: 8),
-                    itemCount: vm.credentials.length,
+            ? ListView(
+                padding: const EdgeInsets.all(24),
+                children: const [
+                  SizedBox(height: 120),
+                  Icon(Icons.lock_outline, size: 64),
+                  SizedBox(height: 12),
+                  Text(
+                    'Todavía no tienes credenciales guardadas',
+                    textAlign: TextAlign.center,
                   ),
+                ],
+              )
+            : ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemBuilder: (context, index) {
+                  final item = vm.credentials[index];
+                  return Card(
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        child: Text(
+                          item.appName.characters.first.toUpperCase(),
+                        ),
+                      ),
+                      title: Text(item.appName),
+                      subtitle: Text(
+                        [
+                          item.accountLabel,
+                          item.emailHint,
+                          item.loginHint,
+                        ].where((e) => e != null && e.isNotEmpty).join(' • '),
+                      ),
+                      trailing: item.isFavorite
+                          ? const Icon(Icons.star)
+                          : const Icon(Icons.chevron_right),
+                      onTap: () async {
+                        final detailVm = context
+                            .read<CredentialDetailViewModel>();
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => ChangeNotifierProvider.value(
+                              value: detailVm,
+                              child: CredentialDetailPage(
+                                credentialId: item.id,
+                              ),
+                            ),
+                          ),
+                        );
+                        if (context.mounted) {
+                          await vm.load();
+                        }
+                      },
+                    ),
+                  );
+                },
+                separatorBuilder: (_, _) => const SizedBox(height: 8),
+                itemCount: vm.credentials.length,
+              ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
