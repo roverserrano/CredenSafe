@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../app/app.dart';
 import '../../../../core/utils/validators.dart';
 import '../../domain/models/decrypted_credential.dart';
 import '../viewmodels/credential_form_viewmodel.dart';
@@ -92,8 +93,14 @@ class _CredentialFormPageState extends State<CredentialFormPage> {
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              _passwordController.text = vm.generatePassword();
+            onPressed: () async {
+              final generated = await AppNavigator.toPasswordGenerator(
+                context,
+                selectionMode: true,
+              );
+              if (generated != null && mounted) {
+                _passwordController.text = generated;
+              }
             },
             icon: const Icon(Icons.password),
             tooltip: 'Generar contraseña',

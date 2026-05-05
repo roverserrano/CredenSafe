@@ -14,7 +14,7 @@ class CredentialFormViewModel extends ChangeNotifier {
     required ReadCredentialUseCase readCredentialUseCase,
     required UpdateCredentialUseCase updateCredentialUseCase,
     required AuditRepository auditRepository,
-    required PasswordGeneratorService generatorService,
+    required IPasswordGeneratorService generatorService,
     required this.sessionViewModel,
   }) : _createCredentialUseCase = createCredentialUseCase,
        _readCredentialUseCase = readCredentialUseCase,
@@ -26,13 +26,15 @@ class CredentialFormViewModel extends ChangeNotifier {
   final ReadCredentialUseCase _readCredentialUseCase;
   final UpdateCredentialUseCase _updateCredentialUseCase;
   final AuditRepository _auditRepository;
-  final PasswordGeneratorService _generatorService;
+  final IPasswordGeneratorService _generatorService;
   SessionViewModel sessionViewModel;
 
   bool isLoading = false;
   String? errorMessage;
 
-  String generatePassword() => _generatorService.generate();
+  String generatePassword() {
+    return _generatorService.generate(const PasswordPolicy()).value;
+  }
 
   Future<DecryptedCredential?> loadCredential(String credentialId) async {
     final context = sessionViewModel.unlockedContext;

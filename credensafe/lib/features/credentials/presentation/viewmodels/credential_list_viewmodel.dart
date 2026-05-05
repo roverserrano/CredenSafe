@@ -20,6 +20,28 @@ class CredentialListViewModel extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
   List<CredentialMetadata> credentials = [];
+  String searchQuery = '';
+
+  List<CredentialMetadata> get filteredCredentials {
+    final query = searchQuery.trim().toLowerCase();
+    if (query.isEmpty) return credentials;
+    return credentials
+        .where((item) => item.appName.toLowerCase().contains(query))
+        .toList();
+  }
+
+  bool get hasActiveSearch => searchQuery.trim().isNotEmpty;
+
+  void updateSearchQuery(String value) {
+    searchQuery = value;
+    notifyListeners();
+  }
+
+  void clearSearch() {
+    if (searchQuery.isEmpty) return;
+    searchQuery = '';
+    notifyListeners();
+  }
 
   Future<void> load() async {
     final vaultId = sessionViewModel.unlockedContext?.vaultId;
