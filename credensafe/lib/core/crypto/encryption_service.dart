@@ -4,19 +4,12 @@ import 'dart:typed_data';
 
 import 'package:cryptography/cryptography.dart';
 
-class EncryptedPayload {
-  EncryptedPayload({
-    required this.payloadEncrypted,
-    required this.nonceBase64,
-  });
+import 'crypto_service.dart';
 
-  final String payloadEncrypted;
-  final String nonceBase64;
-}
-
-class EncryptionService {
+class EncryptionService implements ICryptoService {
   const EncryptionService();
 
+  @override
   Uint8List randomKey({int length = 32}) {
     final random = Random.secure();
     return Uint8List.fromList(
@@ -24,6 +17,7 @@ class EncryptionService {
     );
   }
 
+  @override
   Future<EncryptedPayload> encryptText({
     required String plainText,
     required Uint8List keyBytes,
@@ -50,6 +44,7 @@ class EncryptionService {
     );
   }
 
+  @override
   Future<String> decryptText({
     required String payloadEncrypted,
     required String nonceBase64,
