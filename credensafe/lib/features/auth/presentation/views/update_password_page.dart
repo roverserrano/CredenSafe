@@ -7,10 +7,7 @@ import '../viewmodels/auth_form_status.dart';
 import '../viewmodels/update_password_viewmodel.dart';
 
 class UpdatePasswordPage extends StatefulWidget {
-  const UpdatePasswordPage({
-    super.key,
-    this.isRecoveryFlow = false,
-  });
+  const UpdatePasswordPage({super.key, this.isRecoveryFlow = false});
 
   final bool isRecoveryFlow;
 
@@ -39,9 +36,9 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isRecoveryFlow
-            ? 'Nueva contraseña'
-            : 'Actualizar contraseña'),
+        title: Text(
+          widget.isRecoveryFlow ? 'Nueva contraseña' : 'Actualizar contraseña',
+        ),
       ),
       body: SafeArea(
         child: Center(
@@ -71,9 +68,11 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                           onPressed: () => setState(() {
                             _obscurePassword = !_obscurePassword;
                           }),
-                          icon: Icon(_obscurePassword
-                              ? Icons.visibility
-                              : Icons.visibility_off),
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
                         ),
                       ),
                       validator: Validators.password,
@@ -88,9 +87,11 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                           onPressed: () => setState(() {
                             _obscureConfirm = !_obscureConfirm;
                           }),
-                          icon: Icon(_obscureConfirm
-                              ? Icons.visibility
-                              : Icons.visibility_off),
+                          icon: Icon(
+                            _obscureConfirm
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
                         ),
                       ),
                       validator: (value) => Validators.confirmPassword(

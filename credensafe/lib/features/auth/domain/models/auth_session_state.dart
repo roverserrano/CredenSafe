@@ -11,10 +11,7 @@ enum AuthSessionEvent {
 }
 
 class AuthSessionState {
-  const AuthSessionState({
-    required this.event,
-    this.user,
-  });
+  const AuthSessionState({required this.event, this.user});
 
   final AuthSessionEvent event;
   final AppUser? user;

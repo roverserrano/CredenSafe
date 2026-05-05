@@ -30,6 +30,17 @@ class AuthRemoteService {
     );
   }
 
+  Future<void> resendSignupConfirmation({
+    required String email,
+    String? emailRedirectTo,
+  }) async {
+    await _client.auth.resend(
+      email: email,
+      type: OtpType.signup,
+      emailRedirectTo: emailRedirectTo ?? EnvConfig.authRedirectUrl,
+    );
+  }
+
   Future<void> resetPasswordForEmail({
     required String email,
     String? redirectTo,

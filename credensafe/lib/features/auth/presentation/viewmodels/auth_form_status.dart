@@ -25,10 +25,4 @@ enum PasswordRecoveryStatus {
   error,
 }
 
-enum PasswordChangeStatus {
-  initial,
-  validating,
-  loading,
-  success,
-  error,
-}
+enum PasswordChangeStatus { initial, validating, loading, success, error }

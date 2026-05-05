@@ -52,7 +52,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     TextFormField(
                       controller: _passwordController,
                       obscureText: true,
-                      decoration: const InputDecoration(labelText: 'Contraseña'),
+                      decoration: const InputDecoration(
+                        labelText: 'Contraseña',
+                      ),
                       validator: Validators.password,
                     ),
                     const SizedBox(height: 16),
@@ -73,12 +75,24 @@ class _RegisterPageState extends State<RegisterPage> {
                       const SizedBox(height: 12),
                       Text(
                         vm.errorMessage!,
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                       ),
                     ],
                     if (vm.successMessage != null) ...[
                       const SizedBox(height: 12),
                       Text(vm.successMessage!),
+                      if (vm.status == RegisterStatus.confirmationRequired) ...[
+                        const SizedBox(height: 8),
+                        OutlinedButton.icon(
+                          onPressed: vm.isLoading
+                              ? null
+                              : () => vm.resendConfirmation(),
+                          icon: const Icon(Icons.mark_email_read_outlined),
+                          label: const Text('Reenviar correo'),
+                        ),
+                      ],
                     ],
                     const SizedBox(height: 24),
                     FilledButton(

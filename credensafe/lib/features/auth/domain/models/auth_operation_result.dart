@@ -3,6 +3,7 @@ import 'app_user.dart';
 enum AuthOperationStatus {
   authenticated,
   confirmationRequired,
+  confirmationEmailResent,
   passwordResetEmailSent,
   passwordUpdated,
 }

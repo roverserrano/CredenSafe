@@ -25,7 +25,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<ForgotPasswordViewModel>();
-    final isSuccess = vm.status == PasswordRecoveryStatus.emailSent ||
+    final isSuccess =
+        vm.status == PasswordRecoveryStatus.emailSent ||
         vm.status == PasswordRecoveryStatus.success;
 
     return Scaffold(

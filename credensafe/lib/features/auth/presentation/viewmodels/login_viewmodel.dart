@@ -13,8 +13,7 @@ class LoginViewModel extends ChangeNotifier {
   String? message;
 
   bool get isLoading => status == LoginStatus.loading;
-  String? get errorMessage =>
-      status == LoginStatus.error ? message : null;
+  String? get errorMessage => status == LoginStatus.error ? message : null;
 
   Future<bool> signIn({required String email, required String password}) async {
     status = LoginStatus.loading;

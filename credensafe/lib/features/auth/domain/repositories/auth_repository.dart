@@ -14,6 +14,7 @@ abstract class AuthRepository {
     required String email,
     required String password,
   });
+  Future<AuthOperationResult> resendSignupConfirmation({required String email});
   Future<AuthOperationResult> sendPasswordResetEmail({required String email});
   Future<AuthOperationResult> updatePassword({required String newPassword});
   Future<AuthOperationResult> changePassword({

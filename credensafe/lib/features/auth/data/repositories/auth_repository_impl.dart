@@ -94,6 +94,21 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<AuthOperationResult> resendSignupConfirmation({
+    required String email,
+  }) async {
+    try {
+      await _remoteService.resendSignupConfirmation(email: email);
+      return const AuthOperationResult(
+        status: AuthOperationStatus.confirmationEmailResent,
+        message: 'Reenviamos el correo de confirmación. Revisa tu bandeja.',
+      );
+    } catch (error) {
+      throw AuthErrorMapper.map(error);
+    }
+  }
+
+  @override
   Future<AuthOperationResult> sendPasswordResetEmail({
     required String email,
   }) async {

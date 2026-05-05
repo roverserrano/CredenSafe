@@ -10,13 +10,17 @@ class AuthErrorMapper {
   static AppException map(Object error) {
     if (error is AppException) return error;
     if (error is SocketException) {
-      return AppException(
+      return AppAuthException(
         'No se pudo conectar con el servidor. Revisa tu conexión.',
         code: 'network_error',
       );
     }
     if (error is AuthException) {
-      return AppException(_messageForAuthException(error), code: error.statusCode);
+      return AppAuthException(
+        _messageForAuthException(error),
+        code: error.statusCode,
+        cause: error,
+      );
     }
 
     final raw = error.toString().toLowerCase();
@@ -24,15 +28,16 @@ class AuthErrorMapper {
         raw.contains('connection') ||
         raw.contains('network') ||
         raw.contains('failed host lookup')) {
-      return AppException(
+      return AppAuthException(
         'No se pudo conectar con el servidor. Revisa tu conexión.',
         code: 'network_error',
       );
     }
 
-    return AppException(
+    return AppAuthException(
       'Ocurrió un error inesperado. Intenta nuevamente.',
       code: 'unexpected_auth_error',
+      cause: error,
     );
   }
 
@@ -46,7 +51,7 @@ class AuthErrorMapper {
     }
     if (message.contains('invalid login credentials') ||
         message.contains('invalid credentials')) {
-      return 'Las credenciales son incorrectas.';
+      return 'Las credenciales son incorrectas o el correo aún no fue confirmado.';
     }
     if (message.contains('email not confirmed') ||
         message.contains('not confirmed')) {
