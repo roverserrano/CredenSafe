@@ -12,13 +12,8 @@ abstract class VaultRepository {
     required Vault vault,
     required String masterPassword,
   });
-  Future<bool> canUseBiometricUnlock();
-  Future<bool> promptBiometricUnlock();
-  Future<void> cacheVaultKey({
-    required String vaultId,
-    required String vaultKeyBase64,
+  Future<void> updateBiometricPreference({
+    required String userId,
+    required bool enabled,
   });
-  Future<String?> readCachedVaultKey(String vaultId);
-  Future<void> clearCachedVaultKey();
-  Future<void> setBiometricPreference(bool enabled);
 }

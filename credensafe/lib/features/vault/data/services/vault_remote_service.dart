@@ -20,13 +20,17 @@ class VaultRemoteService {
   }
 
   Future<Map<String, dynamic>?> fetchProfile(String userId) async {
-    return await _client.from('profiles').select().eq('id', userId).maybeSingle();
+    return await _client
+        .from('profiles')
+        .select()
+        .eq('id', userId)
+        .maybeSingle();
   }
 
-  Future<void> updateProfile(String userId, Map<String, dynamic> payload) async {
-    await _client.from('profiles').upsert({
-      'id': userId,
-      ...payload,
-    });
+  Future<void> updateProfile(
+    String userId,
+    Map<String, dynamic> payload,
+  ) async {
+    await _client.from('profiles').upsert({'id': userId, ...payload});
   }
 }

@@ -1,9 +1,7 @@
 import 'dart:convert';
 
-import '../../../../core/crypto/biometric_gate_service.dart';
-import '../../../../core/crypto/encryption_service.dart';
+import '../../../../core/crypto/crypto_service.dart';
 import '../../../../core/crypto/key_derivation_service.dart';
-import '../../../../core/crypto/secure_key_store_service.dart';
 import '../../domain/models/vault.dart';
 import '../../domain/models/vault_unlock_context.dart';
 import '../../domain/repositories/vault_repository.dart';
@@ -12,24 +10,21 @@ import '../services/vault_remote_service.dart';
 class VaultRepositoryImpl implements VaultRepository {
   VaultRepositoryImpl({
     required VaultRemoteService remoteService,
-    required EncryptionService encryptionService,
+    required ICryptoService encryptionService,
     required KeyDerivationService keyDerivationService,
-    required SecureStorageService storageService,
-    required BiometricGateService biometricGateService,
-  })  : _remoteService = remoteService,
-        _encryptionService = encryptionService,
-        _keyDerivationService = keyDerivationService,
-        _storageService = storageService,
-        _biometricGateService = biometricGateService;
+  }) : _remoteService = remoteService,
+       _encryptionService = encryptionService,
+       _keyDerivationService = keyDerivationService;
 
   final VaultRemoteService _remoteService;
-  final EncryptionService _encryptionService;
+  final ICryptoService _encryptionService;
   final KeyDerivationService _keyDerivationService;
-  final SecureStorageService _storageService;
-  final BiometricGateService _biometricGateService;
 
   @override
-  Future<Vault?> fetchPrimaryVault(String userId, {bool biometric = false}) async {
+  Future<Vault?> fetchPrimaryVault(
+    String userId, {
+    bool biometric = false,
+  }) async {
     final vault = await _remoteService.fetchPrimaryVault(userId);
     if (vault == null) return null;
 
@@ -97,44 +92,12 @@ class VaultRepositoryImpl implements VaultRepository {
   }
 
   @override
-  Future<bool> canUseBiometricUnlock() =>
-      _biometricGateService.canUseBiometrics();
-
-  @override
-  Future<bool> promptBiometricUnlock() =>
-      _biometricGateService.authenticate(
-        reason: 'Autentícate para desbloquear tu bóveda en CredenSafe',
-      );
-
-  @override
-  Future<void> cacheVaultKey({
-    required String vaultId,
-    required String vaultKeyBase64,
-  }) async {
-    await _storageService.write(SecureStorageKeys.cachedVaultId, vaultId);
-    await _storageService.write(SecureStorageKeys.cachedVaultKey, vaultKeyBase64);
-  }
-
-  @override
-  Future<void> clearCachedVaultKey() async {
-    await _storageService.delete(SecureStorageKeys.cachedVaultId);
-    await _storageService.delete(SecureStorageKeys.cachedVaultKey);
-  }
-
-  @override
-  Future<String?> readCachedVaultKey(String vaultId) async {
-    final enabled = await _storageService.read(SecureStorageKeys.biometricEnabled);
-    if (enabled != 'true') return null;
-    final cachedVaultId = await _storageService.read(SecureStorageKeys.cachedVaultId);
-    if (cachedVaultId != vaultId) return null;
-    return _storageService.read(SecureStorageKeys.cachedVaultKey);
-  }
-
-  @override
-  Future<void> setBiometricPreference(bool enabled) async {
-    await _storageService.write(
-      SecureStorageKeys.biometricEnabled,
-      enabled.toString(),
-    );
+  Future<void> updateBiometricPreference({
+    required String userId,
+    required bool enabled,
+  }) {
+    return _remoteService.updateProfile(userId, {
+      'is_biometric_enabled': enabled,
+    });
   }
 }

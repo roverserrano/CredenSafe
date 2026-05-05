@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../auth/domain/models/app_user.dart';
 import '../../../auth/domain/models/auth_session_state.dart';
@@ -17,16 +15,13 @@ class SessionViewModel extends ChangeNotifier {
     required AuthRepository authRepository,
     required VaultRepository vaultRepository,
     required AuditRepository auditRepository,
-    required SupabaseClient client,
-  })  : _authRepository = authRepository,
-        _vaultRepository = vaultRepository,
-        _auditRepository = auditRepository,
-        _client = client;
+  }) : _authRepository = authRepository,
+       _vaultRepository = vaultRepository,
+       _auditRepository = auditRepository;
 
   final AuthRepository _authRepository;
   final VaultRepository _vaultRepository;
   final AuditRepository _auditRepository;
-  final SupabaseClient _client;
 
   StreamSubscription<AuthSessionState>? _authSubscription;
 
@@ -35,6 +30,7 @@ class SessionViewModel extends ChangeNotifier {
   Vault? currentVault;
   VaultUnlockContext? unlockedContext;
   bool passwordRecoveryPending = false;
+  String? sessionErrorMessage;
 
   bool get isAuthenticated => currentUser != null;
   bool get hasVault => currentVault != null;
@@ -42,36 +38,69 @@ class SessionViewModel extends ChangeNotifier {
   bool get biometricEnabled => currentVault?.isBiometricEnabled ?? false;
 
   Future<void> initialize() async {
-    currentUser = _authRepository.currentUser();
-    await _bootstrap();
-    _authSubscription?.cancel();
-    _authSubscription =
-        _authRepository.sessionStateChanges().listen((state) async {
-      currentUser = state.user;
-      unlockedContext = null;
-      if (state.event == AuthSessionEvent.passwordRecovery) {
-        passwordRecoveryPending = true;
-      }
+    try {
+      currentUser = _authRepository.currentUser();
       await _bootstrap();
-    });
+    } catch (error) {
+      _setSessionError(error);
+    }
+
+    _authSubscription?.cancel();
+    _authSubscription = _authRepository.sessionStateChanges().listen((
+      state,
+    ) async {
+      try {
+        currentUser = state.user;
+        unlockedContext = null;
+        if (state.event == AuthSessionEvent.passwordRecovery) {
+          passwordRecoveryPending = true;
+        }
+        await _bootstrap();
+      } catch (error) {
+        _setSessionError(error);
+      }
+    }, onError: _setSessionError);
   }
 
   Future<void> _bootstrap() async {
     isInitializing = true;
+    sessionErrorMessage = null;
     notifyListeners();
-    if (currentUser != null) {
-      currentVault = await _vaultRepository.fetchPrimaryVault(currentUser!.id);
-    } else {
+    try {
+      if (currentUser != null) {
+        currentVault = await _vaultRepository.fetchPrimaryVault(
+          currentUser!.id,
+        );
+      } else {
+        currentVault = null;
+      }
+    } catch (error) {
       currentVault = null;
+      unlockedContext = null;
+      sessionErrorMessage = _messageForSessionError(error);
+    } finally {
+      isInitializing = false;
+      notifyListeners();
     }
-    isInitializing = false;
+  }
+
+  Future<void> retryInitialization() => _bootstrap();
+
+  void clearSessionError() {
+    sessionErrorMessage = null;
     notifyListeners();
   }
 
   Future<void> refreshVault() async {
     if (currentUser == null) return;
-    currentVault = await _vaultRepository.fetchPrimaryVault(currentUser!.id);
-    notifyListeners();
+    try {
+      currentVault = await _vaultRepository.fetchPrimaryVault(currentUser!.id);
+      sessionErrorMessage = null;
+      notifyListeners();
+    } catch (error) {
+      _setSessionError(error);
+      rethrow;
+    }
   }
 
   Future<void> unlockWithMasterPassword(String masterPassword) async {
@@ -83,50 +112,11 @@ class SessionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> tryBiometricUnlock() async {
-    if (currentVault == null) return false;
-    final cached = await _vaultRepository.readCachedVaultKey(currentVault!.id);
-    if (cached == null) return false;
+  void unlockWithVaultKey(Uint8List vaultKey) {
+    if (currentVault == null) return;
     unlockedContext = VaultUnlockContext(
       vaultId: currentVault!.id,
-      vaultKey: base64Decode(cached),
-    );
-    notifyListeners();
-    return true;
-  }
-
-  Future<void> setBiometricEnabled(bool enabled) async {
-    if (currentUser == null || currentVault == null) return;
-    await _vaultRepository.setBiometricPreference(enabled);
-    await _client.from('profiles').upsert({
-      'id': currentUser!.id,
-      'is_biometric_enabled': enabled,
-    });
-
-    if (enabled && unlockedContext != null) {
-      await _vaultRepository.cacheVaultKey(
-        vaultId: currentVault!.id,
-        vaultKeyBase64: base64Encode(unlockedContext!.vaultKey),
-      );
-    }
-
-    if (!enabled) {
-      await _vaultRepository.clearCachedVaultKey();
-    }
-
-    currentVault = Vault(
-      id: currentVault!.id,
-      ownerId: currentVault!.ownerId,
-      name: currentVault!.name,
-      vaultKeyEnvelope: currentVault!.vaultKeyEnvelope,
-      vaultKeyEnvelopeNonce: currentVault!.vaultKeyEnvelopeNonce,
-      kdfAlgorithm: currentVault!.kdfAlgorithm,
-      kdfSalt: currentVault!.kdfSalt,
-      kdfMemoryKiB: currentVault!.kdfMemoryKiB,
-      kdfIterations: currentVault!.kdfIterations,
-      kdfParallelism: currentVault!.kdfParallelism,
-      cipherAlgorithm: currentVault!.cipherAlgorithm,
-      isBiometricEnabled: enabled,
+      vaultKey: vaultKey,
     );
     notifyListeners();
   }
@@ -134,7 +124,6 @@ class SessionViewModel extends ChangeNotifier {
   Future<void> signOut() async {
     lockVault();
     passwordRecoveryPending = false;
-    await _vaultRepository.clearCachedVaultKey();
     await _authRepository.signOut();
   }
 
@@ -163,6 +152,26 @@ class SessionViewModel extends ChangeNotifier {
       eventStatus: eventStatus,
       metadata: metadata ?? const <String, dynamic>{},
     );
+  }
+
+  void _setSessionError(Object error) {
+    isInitializing = false;
+    currentVault = null;
+    unlockedContext = null;
+    sessionErrorMessage = _messageForSessionError(error);
+    notifyListeners();
+  }
+
+  String _messageForSessionError(Object error) {
+    final raw = error.toString().toLowerCase();
+    if (raw.contains('socket') ||
+        raw.contains('failed host lookup') ||
+        raw.contains('network') ||
+        raw.contains('connection') ||
+        raw.contains('authretryablefetchexception')) {
+      return 'No se pudo conectar con Supabase. Revisa tu conexión a internet o DNS y vuelve a intentar.';
+    }
+    return 'No se pudo cargar tu sesión. Intenta nuevamente.';
   }
 
   @override

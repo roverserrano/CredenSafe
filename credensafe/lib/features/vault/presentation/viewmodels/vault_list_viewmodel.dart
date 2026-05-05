@@ -9,8 +9,8 @@ class VaultSetupViewModel extends ChangeNotifier {
     required VaultRepository vaultRepository,
     required AuditRepository auditRepository,
     required this.sessionViewModel,
-  })  : _vaultRepository = vaultRepository,
-        _auditRepository = auditRepository;
+  }) : _vaultRepository = vaultRepository,
+       _auditRepository = auditRepository;
 
   final VaultRepository _vaultRepository;
   final AuditRepository _auditRepository;

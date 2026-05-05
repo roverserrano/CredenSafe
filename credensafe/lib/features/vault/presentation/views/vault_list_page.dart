@@ -53,7 +53,9 @@ class _VaultSetupPageState extends State<VaultSetupPage> {
                     const SizedBox(height: 24),
                     TextFormField(
                       controller: _vaultNameController,
-                      decoration: const InputDecoration(labelText: 'Nombre de la bóveda'),
+                      decoration: const InputDecoration(
+                        labelText: 'Nombre de la bóveda',
+                      ),
                       validator: (value) => Validators.requiredField(
                         value,
                         fieldName: 'Nombre de la bóveda',
@@ -86,7 +88,9 @@ class _VaultSetupPageState extends State<VaultSetupPage> {
                       const SizedBox(height: 12),
                       Text(
                         vm.errorMessage!,
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                       ),
                     ],
                     const SizedBox(height: 24),

@@ -1,18 +1,23 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/errors/app_exceptions.dart';
 import '../../../credentials/domain/repositories/audit_repository.dart';
-import '../../domain/repositories/vault_repository.dart';
+import '../../application/usecases/authenticate_with_biometric_use_case.dart';
+import '../../application/usecases/unlock_vault_use_case.dart';
 import 'session_viewmodel.dart';
 
 class UnlockVaultViewModel extends ChangeNotifier {
   UnlockVaultViewModel({
-    required VaultRepository vaultRepository,
+    required UnlockVaultUseCase unlockVaultUseCase,
+    required AuthenticateWithBiometricUseCase authenticateWithBiometricUseCase,
     required this.sessionViewModel,
     required AuditRepository auditRepository,
-  })  : _vaultRepository = vaultRepository,
-        _auditRepository = auditRepository;
+  }) : _unlockVaultUseCase = unlockVaultUseCase,
+       _authenticateWithBiometricUseCase = authenticateWithBiometricUseCase,
+       _auditRepository = auditRepository;
 
-  final VaultRepository _vaultRepository;
+  final UnlockVaultUseCase _unlockVaultUseCase;
+  final AuthenticateWithBiometricUseCase _authenticateWithBiometricUseCase;
   final AuditRepository _auditRepository;
   SessionViewModel sessionViewModel;
 
@@ -21,21 +26,31 @@ class UnlockVaultViewModel extends ChangeNotifier {
   String? errorMessage;
 
   Future<bool> unlockWithPassword(String masterPassword) async {
+    final vault = sessionViewModel.currentVault;
+    if (vault == null) return false;
+
     try {
       isLoading = true;
       errorMessage = null;
       notifyListeners();
-      await sessionViewModel.unlockWithMasterPassword(masterPassword);
+      final unlocked = await _unlockVaultUseCase(
+        vault: vault,
+        masterPassword: masterPassword,
+      );
+      sessionViewModel.unlockWithVaultKey(unlocked.vaultKey);
       await sessionViewModel.registerAudit(eventType: 'vault_unlocked');
       return true;
-    } catch (_) {
-      errorMessage = 'Contraseña maestra incorrecta o bóveda inválida';
+    } on AppException catch (error) {
+      errorMessage = error.message;
       await _auditRepository.insertEvent(
         userId: sessionViewModel.currentUser?.id ?? '',
         vaultId: sessionViewModel.currentVault?.id,
         eventType: 'vault_unlock_failed',
         eventStatus: 'failed',
       );
+      return false;
+    } catch (_) {
+      errorMessage = 'Contraseña maestra incorrecta o bóveda inválida';
       return false;
     } finally {
       isLoading = false;
@@ -44,27 +59,26 @@ class UnlockVaultViewModel extends ChangeNotifier {
   }
 
   Future<bool> unlockWithBiometrics() async {
+    final user = sessionViewModel.currentUser;
+    final vault = sessionViewModel.currentVault;
+    if (user == null || vault == null) return false;
+
     try {
       isBiometricLoading = true;
       errorMessage = null;
       notifyListeners();
-      final canUse = await _vaultRepository.canUseBiometricUnlock();
-      if (!canUse) {
-        errorMessage = 'Biometría no disponible en este dispositivo';
-        return false;
-      }
-      final approved = await _vaultRepository.promptBiometricUnlock();
-      if (!approved) {
-        errorMessage = 'La autenticación biométrica fue cancelada o rechazada';
-        return false;
-      }
-      final ok = await sessionViewModel.tryBiometricUnlock();
-      if (ok) {
-        await sessionViewModel.registerAudit(eventType: 'vault_unlocked_biometric');
-      } else {
-        errorMessage = 'No hay una clave segura almacenada para este dispositivo';
-      }
-      return ok;
+      final vaultKey = await _authenticateWithBiometricUseCase(
+        userId: user.id,
+        vaultId: vault.id,
+      );
+      sessionViewModel.unlockWithVaultKey(vaultKey);
+      return true;
+    } on AppException catch (error) {
+      errorMessage = error.message;
+      return false;
+    } catch (_) {
+      errorMessage = 'No se pudo desbloquear con biometría';
+      return false;
     } finally {
       isBiometricLoading = false;
       notifyListeners();

@@ -64,7 +64,9 @@ class _UnlockVaultPageState extends State<UnlockVaultPage> {
                       const SizedBox(height: 12),
                       Text(
                         vm.errorMessage!,
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                       ),
                     ],
                     const SizedBox(height: 24),
@@ -83,16 +85,18 @@ class _UnlockVaultPageState extends State<UnlockVaultPage> {
                             )
                           : const Text('Desbloquear'),
                     ),
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      onPressed: vm.isBiometricLoading
-                          ? null
-                          : () async {
-                              await vm.unlockWithBiometrics();
-                            },
-                      icon: const Icon(Icons.fingerprint),
-                      label: const Text('Usar biometría'),
-                    ),
+                    if (sessionVm.biometricEnabled) ...[
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: vm.isBiometricLoading
+                            ? null
+                            : () async {
+                                await vm.unlockWithBiometrics();
+                              },
+                        icon: const Icon(Icons.fingerprint),
+                        label: const Text('Usar biometría'),
+                      ),
+                    ],
                     const SizedBox(height: 12),
                     TextButton(
                       onPressed: () => sessionVm.signOut(),
