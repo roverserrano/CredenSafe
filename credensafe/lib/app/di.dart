@@ -30,6 +30,7 @@ import '../features/credentials/presentation/viewmodels/credential_detail_viewmo
 import '../features/credentials/presentation/viewmodels/credential_form_viewmodel.dart';
 import '../features/credentials/presentation/viewmodels/credential_list_viewmodel.dart';
 import '../features/credentials/presentation/viewmodels/security_activity_viewmodel.dart';
+import '../features/password_generator/presentation/viewmodels/password_generator_viewmodel.dart';
 import '../features/setting/presentation/viewmodels/settings_viewmodel.dart';
 import '../features/vault/application/usecases/authenticate_with_biometric_use_case.dart';
 import '../features/vault/application/usecases/set_biometric_unlock_use_case.dart';
@@ -54,7 +55,9 @@ class AppProviders extends StatelessWidget {
         Provider(create: (_) => const SecureStorageService()),
         Provider(create: (_) => const KeyDerivationService()),
         Provider<ICryptoService>(create: (_) => const EncryptionService()),
-        Provider(create: (_) => const PasswordGeneratorService()),
+        Provider<IPasswordGeneratorService>(
+          create: (_) => PasswordGeneratorService(),
+        ),
         Provider<IBiometricService>(
           create: (context) =>
               BiometricService(storage: context.read<SecureStorageService>()),
@@ -190,7 +193,7 @@ class AppProviders extends StatelessWidget {
             readCredentialUseCase: context.read<ReadCredentialUseCase>(),
             updateCredentialUseCase: context.read<UpdateCredentialUseCase>(),
             auditRepository: context.read<AuditRepository>(),
-            generatorService: context.read<PasswordGeneratorService>(),
+            generatorService: context.read<IPasswordGeneratorService>(),
             sessionViewModel: context.read<SessionViewModel>(),
           ),
           update: (_, sessionVm, current) =>
@@ -224,6 +227,11 @@ class AppProviders extends StatelessWidget {
           create: (context) => SecurityActivityViewModel(
             auditRepository: context.read<AuditRepository>(),
             sessionViewModel: context.read<SessionViewModel>(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => PasswordGeneratorViewModel(
+            context.read<IPasswordGeneratorService>(),
           ),
         ),
       ],

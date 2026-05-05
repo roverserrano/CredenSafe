@@ -8,6 +8,7 @@ import '../features/auth/presentation/views/update_password_page.dart';
 import '../features/credentials/presentation/views/credential_form_page.dart';
 import '../features/credentials/presentation/views/credential_list_page.dart';
 import '../features/credentials/presentation/views/security_activity_page.dart';
+import '../features/password_generator/presentation/views/password_generator_page.dart';
 import '../features/setting/presentation/views/setting_page.dart';
 import '../features/vault/presentation/viewmodels/session_viewmodel.dart';
 import '../features/vault/presentation/views/unlock_vault_page.dart';
@@ -266,5 +267,16 @@ class AppNavigator {
     return Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (_) => const SettingsPage()));
+  }
+
+  static Future<String?> toPasswordGenerator(
+    BuildContext context, {
+    bool selectionMode = false,
+  }) {
+    return Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (_) => PasswordGeneratorPage(selectionMode: selectionMode),
+      ),
+    );
   }
 }
